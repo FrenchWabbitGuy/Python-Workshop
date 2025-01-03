@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter.filedialog import asksaveasfilename, askopenfilename
-from multiprocessing import Process
+from multiprocessing import Process, freeze_support
 import pyglet as pyg
+import sys
 import re, sys, io, builtins, webview
 
 def watchVideo(link):
-    webview.create_window("YouTube Video Player", link)  # Replace with your video link
+    webview.create_window("YouTube Video Player", link)
     webview.start()
 
 def myApp():
@@ -13,14 +14,6 @@ def myApp():
     pink_chars = {'yield', 'async', 'import', 'as', 'from', 'if', 'elif', 'else', 'for', 'while', 'with', 'pass', 'break', 'return', 'await', 'except', 'in', 'raise', 'finally', 'try', 'assert', 'del', ''}
     cyan_chars = {'random'}
 
-
-    links = ("https://youtu.be/KDrCDxAGNy0",
-            "https://youtu.be/nbYUNveOzkE",
-            "https://youtu.be/xOumwJdpy-g",
-            "https://youtu.be/Gn6_UytN3v8",
-            "https://youtu.be/s9eQCVsnaQs",
-            "https://youtu.be/AV95EhokZXQ",
-            "https://youtu.be/K9MI-hVMBcs")
     writeText = [
         "\n\tHello! Welcome to your workshop. Would\n\tyou like a quick tutorial on how to use\n\tthe 'Python' programming language?",
         "\n\tLet's make a Random Password Generator!\n\tYou can watch the first step by clicking\n\tthe button down below.",
@@ -83,8 +76,14 @@ def myApp():
             watchButton.place(relx=0, rely=1, anchor="sw", x=200, y=-250)
     
     def startView():
-        p = Process(target=watchVideo, args=(links[current_step-1],))
+        with open('link.txt', 'r') as file:
+            lines = file.readlines()
+            
+            if current_step <= len(lines):
+                content = lines[current_step - 1].strip()
+        p = Process(target=watchVideo, args=(content,))
         p.start()
+        p.join()
 
     def set_file_path(path):
         global file_path
@@ -253,7 +252,7 @@ def myApp():
     file_button.add_command(label='Open', command=open_file)
     file_button.add_command(label='Save', command=save_file)
     file_button.add_command(label='Save As', command=save_as_file)
-    file_button.add_command(label='Exit', command=exit)
+    file_button.add_command(label='Exit', command=sys.exit)
     menu_bar.add_cascade(label='File', menu=file_button)
 
     # Run Button
@@ -301,5 +300,6 @@ def myApp():
     compiler.mainloop()
 
 if __name__ == "__main__":
+    freeze_support()
     myApp()
 
